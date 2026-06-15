@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — Arena Booking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+      body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    </style>
+  </head>
+  <!-- Mengubah body menjadi flex-col agar header di atas dan konten di tengah -->
+  <body class="min-h-screen bg-slate-50 flex flex-col text-slate-800">
+    
+    <!-- Header -->
+    <header class="w-full bg-white border-b border-slate-200 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2 transition-transform hover:scale-105">
+          <div class="bg-indigo-600 text-white p-1.5 rounded-lg">
+            <i class="ph ph-soccer-ball text-xl"></i>
+          </div>
+          <span class="font-bold text-xl text-slate-900">Arena<span class="text-indigo-600">Booking</span></span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex items-center justify-center p-6">
+      <main class="w-full max-w-md bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+        <div class="p-8">
+          
+          <!-- Heading -->
+          <div class="flex flex-col items-center text-center mb-8">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 rounded-2xl mb-5">
+              <!-- Icon yang sama dari kode sebelumnya, dengan warna disesuaikan -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12A9 9 0 1112 3a9 9 0 019 9z" />
+              </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900">Selamat Datang</h1>
+            <p class="text-sm text-slate-500 mt-1.5">Masuk untuk mulai booking lapangan</p>
+          </div>
+
+          <!-- Role Toggle (Segmented Control) -->
+          <div class="flex justify-center mb-8">
+            <div class="bg-slate-100 p-1 rounded-full inline-flex w-full max-w-[200px]">
+              <button id="role-user" class="flex-1 px-4 py-1.5 rounded-full bg-white shadow-sm text-sm font-semibold text-slate-800 transition-all">User</button>
+              <button id="role-admin" class="flex-1 px-4 py-1.5 rounded-full text-sm font-semibold text-slate-500 hover:text-slate-700 transition-all">Admin</button>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <form id="login-form" class="space-y-5" autocomplete="on" onsubmit="return false;">
+            <input type="hidden" name="role" id="role-input" value="user" />
+
+            <div>
+              <label for="email" class="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
+              <input id="email" name="email" type="email" required placeholder="email@contoh.com" 
+                class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition-all placeholder:text-slate-400" />
+            </div>
+
+            <div>
+              <label for="password" class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+              <input id="password" name="password" type="password" required placeholder="••••••••" 
+                class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition-all placeholder:text-slate-400" />
+            </div>
+
+            <button type="submit" id="submit-btn" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 active:bg-indigo-800 transition-colors shadow-md shadow-indigo-600/20 mt-2 flex justify-center items-center gap-2">
+              <span id="btn-text">Masuk</span>
+            </button>
+          </form>
+
+          <p class="mt-8 text-center text-sm text-slate-500">
+            Belum punya akun? <a href="/register" class="text-indigo-600 font-semibold hover:text-indigo-700 hover:underline transition-colors">Daftar sekarang</a>
+          </p>
+        </div>
+      </main>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-3 z-50"></div>
+
+    <script>
+      function showToast(msg, type='success'){
+        const container = document.getElementById('toast-container');
+        const el = document.createElement('div');
+        el.className = 'px-5 py-3.5 rounded-xl shadow-lg text-white font-medium text-sm flex items-center gap-2 transition-all transform translate-y-0 opacity-100 ' + (type==='success'? 'bg-emerald-500' : 'bg-rose-500');
+        el.innerHTML = type === 'success' 
+            ? `<i class="ph ph-check-circle text-lg"></i> ${msg}`
+            : `<i class="ph ph-warning-circle text-lg"></i> ${msg}`;
+        container.appendChild(el);
+        setTimeout(() => {
+            el.classList.add('opacity-0', 'translate-y-2');
+            setTimeout(() => el.remove(), 300);
+        }, 3500);
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const roleUserBtn = document.getElementById('role-user');
+        const roleAdminBtn = document.getElementById('role-admin');
+        const roleInput = document.getElementById('role-input');
+
+        function setRole(r){
+          roleInput.value = r;
+          if(r === 'admin'){
+            roleAdminBtn.className = 'flex-1 px-4 py-1.5 rounded-full bg-white shadow-sm text-sm font-semibold text-slate-800 transition-all';
+            roleUserBtn.className = 'flex-1 px-4 py-1.5 rounded-full text-sm font-semibold text-slate-500 hover:text-slate-700 transition-all';
+          } else {
+            roleUserBtn.className = 'flex-1 px-4 py-1.5 rounded-full bg-white shadow-sm text-sm font-semibold text-slate-800 transition-all';
+            roleAdminBtn.className = 'flex-1 px-4 py-1.5 rounded-full text-sm font-semibold text-slate-500 hover:text-slate-700 transition-all';
+          }
+        }
+
+        roleUserBtn.addEventListener('click', (e)=>{ e.preventDefault(); setRole('user'); });
+        roleAdminBtn.addEventListener('click', (e)=>{ e.preventDefault(); setRole('admin'); });
+
+        const loginForm = document.getElementById('login-form');
+        loginForm.addEventListener('submit', async (ev)=>{
+          ev.preventDefault();
+          const btn = document.getElementById('submit-btn');
+          const btnText = document.getElementById('btn-text');
+          if(btn) { btn.disabled = true; btn.classList.add('opacity-80', 'cursor-not-allowed'); if(btnText) btnText.innerHTML = '<i class="ph ph-spinner animate-spin text-lg"></i> Memproses...'; }
+
+          const payload = {
+            email: (document.getElementById('email') || {}).value?.trim() || '',
+            password: (document.getElementById('password') || {}).value || '',
+            role: roleInput.value || 'user'
+          };
+
+          try{
+            // Simulasi proses API (hapus atau sesuaikan bagian ini untuk implementasi aslinya)
+            // await new Promise(resolve => setTimeout(resolve, 1000));
+            // throw new Error("Fitur belum terhubung ke backend");
+            
+            const res = await fetch('/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            let data;
+            const ct = res.headers.get('content-type') || '';
+            if(ct.includes('application/json')) data = await res.json(); else {
+              const text = await res.text();
+              try{ data = JSON.parse(text); } catch(e){ data = { message: text }; }
+            }
+
+            if(!res.ok) throw new Error(data.message || 'Login gagal');
+
+            if(data.token) localStorage.setItem('token', data.token);
+            if(data.role) localStorage.setItem('role', data.role);
+
+            showToast('Login berhasil — mengalihkan...');
+            const finalRole = data.role || payload.role || 'user';
+
+            setTimeout(()=>{
+              window.location.href = finalRole === 'admin' ? '/dashboard-admin' : '/dashboard-user';
+            }, 900);
+
+          } catch(err){
+            showToast(err.message || 'Terjadi kesalahan', 'error');
+            if(btn) { btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed'); if(btnText) btnText.innerText = 'Masuk'; }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

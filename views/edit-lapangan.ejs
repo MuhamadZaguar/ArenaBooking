@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Lapangan — Arena Booking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 600: '#2563eb', 900: '#1e3a8a' } } } } }</script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+      <div class="flex items-center gap-2">
+        <div class="bg-brand-900 text-white p-2 rounded-lg"><i class="ph ph-pencil text-2xl"></i></div>
+        <span class="font-bold text-xl text-slate-900">Edit<span class="text-brand-600"> Lapangan</span></span>
+      </div>
+      <button onclick="goBack()" class="text-slate-600 text-sm font-semibold flex items-center gap-1 hover:text-slate-900"><i class="ph ph-arrow-left"></i> Kembali</button>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full container-centered">
+  <div class="card overflow-hidden">
+      <div class="px-6 py-5 border-b border-slate-200 bg-slate-50/50">
+        <h3 class="text-lg font-semibold text-slate-800">Edit Data Lapangan</h3>
+      </div>
+  <div class="p-6">
+        <form id="edit-lapangan-form" class="grid grid-cols-1 gap-4">
+          <input type="hidden" name="id" />
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lapangan</label>
+            <input name="nama_lapangan" required class="w-full px-3 py-2 border border-slate-200 rounded-md" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Jenis Olahraga</label>
+            <input name="jenis_olahraga" class="w-full px-3 py-2 border border-slate-200 rounded-md" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Lokasi</label>
+            <input name="lokasi" class="w-full px-3 py-2 border border-slate-200 rounded-md" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Harga per jam</label>
+            <input name="harga_per_jam" required type="number" class="w-full px-3 py-2 border border-slate-200 rounded-md" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Deskripsi</label>
+            <textarea name="deskripsi" class="w-full px-3 py-2 border border-slate-200 rounded-md" rows="3"></textarea>
+          </div>
+          <div class="text-right">
+            <button type="submit" class="btn-primary">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    if(!token || role !== 'admin') { window.location.replace('/login'); }
+
+    function goBack(){ window.location.replace('/dashboard-admin'); }
+
+    async function loadLapangan(){
+      const parts = window.location.pathname.split('/');
+      const id = parts[parts.length-1];
+      try{
+        const res = await fetch('/lapangan/' + id);
+        if(!res.ok) throw new Error('Gagal memuat data');
+        const data = await res.json();
+        const form = document.getElementById('edit-lapangan-form');
+        form.id.value = data.id;
+        form.nama_lapangan.value = data.nama_lapangan || '';
+        form.jenis_olahraga.value = data.jenis_olahraga || '';
+  form.lokasi.value = data.lokasi || '';
+        form.harga_per_jam.value = data.harga_per_jam || '';
+        form.deskripsi.value = data.deskripsi || '';
+      }catch(e){ alert(e.message || 'Gagal memuat lapangan'); }
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      loadLapangan();
+      const form = document.getElementById('edit-lapangan-form');
+      form.addEventListener('submit', async (ev)=>{
+        ev.preventDefault();
+        const fd = new FormData(form);
+        const id = fd.get('id');
+        const payload = {
+          nama_lapangan: fd.get('nama_lapangan'),
+          jenis_olahraga: fd.get('jenis_olahraga'),
+          harga_per_jam: Number(fd.get('harga_per_jam')) || 0,
+          deskripsi: fd.get('deskripsi')
+        };
+        try{
+          const res = await fetch('/lapangan/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify(payload) });
+          const data = await res.json();
+          if(!res.ok) throw new Error(data.message || 'Gagal menyimpan');
+          alert(data.message || 'Berhasil diupdate');
+          window.location.replace('/dashboard-admin');
+        }catch(e){ alert(e.message || 'Gagal menyimpan'); }
+      });
+    });
+  </script>
+</body>
+</html>

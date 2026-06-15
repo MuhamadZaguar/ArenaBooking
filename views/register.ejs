@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar Akun — Arena Booking</title>
+    
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+      body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    </style>
+  </head>
+  <!-- Mengubah body menjadi flex-col agar layout seragam dengan halaman Login -->
+  <body class="min-h-screen bg-slate-50 flex flex-col text-slate-800">
+
+    <!-- Header -->
+    <header class="w-full bg-white border-b border-slate-200 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2 transition-transform hover:scale-105">
+          <div class="bg-indigo-600 text-white p-1.5 rounded-lg">
+            <i class="ph ph-soccer-ball text-xl"></i>
+          </div>
+          <span class="font-bold text-xl text-slate-900">Arena<span class="text-indigo-600">Booking</span></span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex items-center justify-center p-6 py-10">
+      <main class="w-full max-w-md bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+        <div class="p-8">
+          
+          <!-- Heading Section -->
+          <div class="flex flex-col items-center text-center mb-8">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl mb-5">
+              <i class="ph ph-user-plus text-3xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900">Daftar Akun Baru</h1>
+            <p class="text-sm text-slate-500 mt-1.5">Buat akun untuk mulai memesan lapangan dengan mudah</p>
+          </div>
+          
+          <!-- Form Section -->
+          <form id="register-form" class="space-y-5">
+            
+            <!-- Input Nama -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Lengkap</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <i class="ph ph-user text-xl"></i>
+                </div>
+                <input type="text" name="nama" required placeholder="Budi Santoso" 
+                  class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-sm placeholder:text-slate-400" />
+              </div>
+            </div>
+            
+            <!-- Input Email -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <i class="ph ph-envelope-simple text-xl"></i>
+                </div>
+                <input type="email" name="email" required placeholder="budi@email.com" 
+                  class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-sm placeholder:text-slate-400" />
+              </div>
+            </div>
+            
+            <!-- Input Password -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <i class="ph ph-lock-key text-xl"></i>
+                </div>
+                <input type="password" name="password" required placeholder="••••••••" 
+                  class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-sm placeholder:text-slate-400" />
+              </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit" id="submit-btn" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 active:bg-indigo-800 transition-colors shadow-md shadow-indigo-600/20 mt-2 flex justify-center items-center gap-2 group">
+              <span id="btn-text">Daftar Sekarang</span>
+              <i class="ph ph-arrow-right text-lg transition-transform group-hover:translate-x-1"></i>
+            </button>
+          </form>
+          
+          <!-- Footer Link -->
+          <div class="mt-8 text-center text-sm text-slate-500">
+            Sudah punya akun? <a href="/index.html" class="text-indigo-600 font-semibold hover:text-indigo-700 hover:underline transition-colors">Masuk di sini</a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-3 z-50"></div>
+
+    <!-- JavaScript Logic -->
+    <script>
+      function showToast(msg, type='success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        
+        const icon = type === 'success' ? '<i class="ph-fill ph-check-circle text-lg"></i>' : '<i class="ph-fill ph-warning-circle text-lg"></i>';
+        const bg = type === 'success' ? 'bg-emerald-500' : 'bg-rose-500';
+        
+        toast.className = `flex items-center gap-2 px-5 py-3.5 rounded-xl shadow-lg text-white font-medium text-sm transform transition-all duration-300 translate-y-10 opacity-0 ${bg}`;
+        toast.innerHTML = `${icon} <span>${msg}</span>`;
+        
+        container.appendChild(toast);
+        
+        // Trigger Animation In
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-y-10', 'opacity-0');
+        });
+        
+        // Trigger Animation Out
+        setTimeout(() => {
+          toast.classList.add('translate-y-10', 'opacity-0');
+          setTimeout(() => toast.remove(), 300);
+        }, 3500);
+      }
+
+      document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const btn = e.target.querySelector('button[type="submit"]');
+        const btnText = document.getElementById('btn-text');
+        const arrowIcon = btn.querySelector('.ph-arrow-right');
+        
+        const oriText = btnText.innerText;
+        
+        // Set loading state
+        btnText.innerHTML = 'Memproses...';
+        if(arrowIcon) arrowIcon.className = 'ph ph-spinner animate-spin text-lg';
+        btn.disabled = true;
+        btn.classList.add('opacity-80', 'cursor-not-allowed');
+
+        const nama = e.target.nama.value;
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+
+        try {
+          // Simulasi Fetch API (Dapat dihapus untuk integrasi backend aslinya)
+          // await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const res = await fetch('/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nama, email, password })
+          });
+          
+          let data;
+          const ct = res.headers.get('content-type') || '';
+          if(ct.includes('application/json')) data = await res.json(); 
+          else {
+            const text = await res.text();
+            try { data = JSON.parse(text); } catch(err) { data = { message: text }; }
+          }
+          
+          if(!res.ok) throw new Error(data.message || 'Gagal mendaftar. Email mungkin sudah digunakan.');
+          
+          showToast('Pendaftaran berhasil! Mengalihkan ke halaman login...', 'success');
+          e.target.reset();
+          
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000); 
+          
+        } catch (err) {
+          showToast(err.message, 'error');
+          
+          // Reset loading state
+          btnText.innerText = oriText;
+          if(arrowIcon) arrowIcon.className = 'ph ph-arrow-right text-lg transition-transform group-hover:translate-x-1';
+          btn.disabled = false;
+          btn.classList.remove('opacity-80', 'cursor-not-allowed');
+        }
+      });
+    </script>
+  </body>
+</html>

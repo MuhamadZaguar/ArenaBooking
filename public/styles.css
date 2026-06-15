@@ -1,0 +1,57 @@
+:root{
+  --brand: #2563eb;
+  --muted: #6b7280;
+}
+
+html,body{height:100%;}
+body{
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  color: #0f172a;
+}
+
+/* card utility to make sections more elegant */
+.card{
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.08);
+  border: 1px solid rgba(15,23,42,0.04);
+}
+
+/* primary button override to provide consistent look */
+.btn-primary{
+  background: var(--brand);
+  color: white;
+  padding: 0.5rem 0.875rem;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(37,99,235,0.16);
+}
+.btn-primary:hover{ filter:brightness(0.95); }
+
+/* subtle input focus */
+input[type="text"], input[type="email"], input[type="number"], input[type="search"], textarea, select{
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+input:focus, textarea:focus, select:focus{
+  box-shadow: 0 6px 18px rgba(37,99,235,0.08);
+  outline: none;
+  border-color: rgba(37,99,235,0.6);
+}
+
+/* smaller helper for muted text */
+.text-muted{ color: var(--muted); }
+
+/* improve table look */
+table{ border-collapse:collapse; }
+thead th{ background:#fbfbfd; }
+tbody tr:hover{ background: #fbfbff; }
+
+/* responsive container helper */
+.container-centered{ max-width:1120px; margin:0 auto; padding-left:1rem; padding-right:1rem; }
+
+/* polished small utilities */
+.rounded-lg-12{ border-radius:12px; }
+
+/* keep file input prettier on older browsers */
+input[type=file]{ border-radius:8px; }

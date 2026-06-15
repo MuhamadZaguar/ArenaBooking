@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Arena Booking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' } } } } }</script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-2">
+          <div class="bg-brand-600 text-white p-2 rounded-lg"><i class="ph ph-soccer-ball text-2xl"></i></div>
+          <a href="#" class="font-bold text-xl text-slate-900 tracking-tight">Arena<span class="text-brand-600">Booking</span></a>
+        </div>
+        <nav class="flex items-center gap-4">
+          <a href="/riwayat" class="text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors flex items-center gap-1"><i class="ph ph-clock-counter-clockwise"></i> Riwayat</a>
+          <button onclick="logout()" class="text-sm font-medium px-4 py-2 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 transition-colors">Logout</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+  <div class="bg-gradient-to-br from-brand-600 to-brand-800 rounded-2xl p-8 sm:p-12 mb-10 text-white shadow-lg relative overflow-hidden card">
+      <div class="relative z-10 max-w-2xl">
+        <h1 class="text-3xl sm:text-4xl font-bold mb-3">Pilih dan Booking Lapanganmu</h1>
+        <p class="text-brand-100 text-lg">Lihat jadwal, pilih durasi, dan unggah bukti pembayaran langsung dari dashboard ini.</p>
+      </div>
+      <i class="ph ph-basketball absolute -right-10 -bottom-10 text-[200px] text-white opacity-10 rotate-12"></i>
+    </div>
+
+  <div class="mb-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2"><i class="ph-fill ph-map-pin text-brand-500"></i> Lapangan Tersedia</h2>
+      </div>
+
+      <!-- Filter controls -->
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+        <div>
+          <label class="text-xs text-slate-500">Cari nama</label>
+          <input id="filter-search" type="search" placeholder="Cari lapangan..." class="w-full px-3 py-2 rounded-md border border-slate-200 bg-white" />
+        </div>
+        <div>
+          <label class="text-xs text-slate-500">Filter daerah</label>
+          <select id="filter-lokasi" class="w-full px-3 py-2 rounded-md border border-slate-200 bg-white">
+            <option value="all">Semua daerah</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-slate-500">Urutkan</label>
+          <select id="filter-sort" class="w-full px-3 py-2 rounded-md border border-slate-200 bg-white">
+            <option value="default">Default</option>
+            <option value="price-asc">Harga: Rendah ke Tinggi</option>
+            <option value="price-desc">Harga: Tinggi ke Rendah</option>
+            <option value="name-asc">Nama: A → Z</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-slate-500">Filter harga</label>
+          <select id="filter-price" class="w-full px-3 py-2 rounded-md border border-slate-200 bg-white">
+            <option value="all">Semua harga</option>
+            <option value="lt50000">&lt; Rp50.000</option>
+            <option value="50to100">Rp50.000 - Rp100.000</option>
+            <option value="gt100000">&gt; Rp100.000</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="lapangan-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="col-span-full text-center py-10 text-slate-500"><i class="ph ph-spinner animate-spin text-3xl mb-2"></i><p>Memuat data...</p></div>
+    </div>
+  </main>
+
+  <!-- Modal Booking -->
+  <div id="booking-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full my-8">
+      <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-xl">
+        <h3 class="font-bold text-lg text-slate-900" id="modal-lapangan-title">Form Booking</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-rose-500"><i class="ph ph-x text-xl"></i></button>
+      </div>
+      <form id="modal-booking-form" class="p-6 space-y-4">
+        <input type="hidden" id="modal-lapangan-id" name="lapangan_id" />
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Main</label>
+          <input type="date" id="modal-tanggal" name="tanggal" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none" />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Jam Mulai</label><input type="time" name="jam_mulai" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none" /></div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Durasi</label>
+            <select name="durasi" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+              <option value="60">1 Jam</option><option value="120" selected>2 Jam</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Bukti Pembayaran</label>
+          <input type="file" name="bukti_bayar" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100" />
+        </div>
+        <div class="pt-4 flex gap-3">
+          <button type="button" onclick="closeModal()" class="flex-1 py-2 bg-slate-100 font-medium rounded-lg hover:bg-slate-200">Batal</button>
+          <button type="submit" class="flex-1 py-2 bg-brand-600 text-white font-medium rounded-lg hover:bg-brand-700">Konfirmasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <script>
+      // client-side data + filters for lapangan
+      let lapanganData = [];
+      function renderLapangan(){
+        const search = (document.getElementById('filter-search') || {}).value?.toLowerCase() || '';
+        const sort = (document.getElementById('filter-sort') || {}).value || 'default';
+        const price = (document.getElementById('filter-price') || {}).value || 'all';
+        const lokasiFilter = (document.getElementById('filter-lokasi') || {}).value || 'all';
+
+        let list = Array.isArray(lapanganData) ? lapanganData.slice() : [];
+
+        // filter by name
+        if(search) list = list.filter(i => (i.nama_lapangan || '').toLowerCase().includes(search));
+
+        // filter by lokasi/daerah
+        if(lokasiFilter && lokasiFilter !== 'all'){
+          list = list.filter(i => (i.lokasi || '').toLowerCase() === (lokasiFilter||'').toLowerCase());
+        }
+
+        // filter by price
+        list = list.filter(i => {
+          const p = Number(i.harga_per_jam) || 0;
+          if(price === 'lt50000') return p < 50000;
+          if(price === '50to100') return p >= 50000 && p <= 100000;
+          if(price === 'gt100000') return p > 100000;
+          return true;
+        });
+
+        // sort
+        if(sort === 'price-asc') list.sort((a,b) => (Number(a.harga_per_jam)||0) - (Number(b.harga_per_jam)||0));
+        if(sort === 'price-desc') list.sort((a,b) => (Number(b.harga_per_jam)||0) - (Number(a.harga_per_jam)||0));
+        if(sort === 'name-asc') list.sort((a,b) => ((a.nama_lapangan||'').localeCompare(b.nama_lapangan||'')) );
+
+        const grid = document.getElementById('lapangan-grid');
+        if(!grid) return;
+        if(!list.length){
+          grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">Tidak ada lapangan cocok.</div>';
+          return;
+        }
+
+        grid.innerHTML = list.map(i => `
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col hover:shadow-md transition-shadow">
+            <h3 class="font-bold text-lg text-slate-900">${i.nama_lapangan}</h3>
+            <p class="text-xs text-slate-500 mt-1"><i class="ph ph-map-pin"></i> ${i.lokasi || '-'} </p>
+            <p class="text-sm text-slate-500 mt-2 mb-4 flex-1">${i.deskripsi || 'Lapangan berkualitas siap pakai.'}</p>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+              <p class="font-bold text-slate-900">Rp ${Number(i.harga_per_jam).toLocaleString('id-ID')}<span class="text-xs font-normal text-slate-500">/jam</span></p>
+              <button onclick="openModal('${i.id}', '${i.nama_lapangan}')" class="bg-brand-50 text-brand-600 hover:bg-brand-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">Booking</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    // Pastikan user punya token
+    const token = localStorage.getItem('token');
+    if(!token) {
+      // paksa pindah ke home (gunakan replace agar tidak bisa back ke dashboard)
+      window.location.replace('/');
+    }
+
+    function logout() {
+      // hapus semua token/role yang tersisa
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      // pindah ke home menggunakan replace untuk mencegah pengguna kembali ke dashboard via back
+      window.location.replace('/');
+    }
+    function closeModal() { document.getElementById('booking-modal').classList.add('hidden'); }
+
+    async function fetchLapangan() {
+      try {
+        const res = await fetch('/lapangan');
+        const data = await res.json();
+        lapanganData = Array.isArray(data) ? data : [];
+        // populate lokasi filter options (unique values)
+        try{
+          const sel = document.getElementById('filter-lokasi');
+          if(sel){
+            const locations = Array.from(new Set(lapanganData.map(i=> (i.lokasi||'').trim()).filter(Boolean)));
+            sel.innerHTML = '<option value="all">Semua daerah</option>' + locations.map(l=>`<option value="${l}">${l}</option>`).join('');
+          }
+        }catch(e){/* ignore */}
+        renderLapangan();
+      } catch(e) { console.error(e); }
+    }
+
+    // attach filter listeners
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const search = document.getElementById('filter-search');
+      const sort = document.getElementById('filter-sort');
+      const price = document.getElementById('filter-price');
+      const lokasi = document.getElementById('filter-lokasi');
+      [search, sort, price, lokasi].forEach(el=>{ if(el) el.addEventListener('input', renderLapangan); });
+    });
+
+    function openModal(id, nama) {
+      document.getElementById('modal-lapangan-id').value = id;
+      document.getElementById('modal-lapangan-title').innerText = `Booking: ${nama}`;
+      document.getElementById('booking-modal').classList.remove('hidden');
+    }
+
+    document.getElementById('modal-booking-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      // build JSON payload from form (lapangan_id, tanggal, jam_mulai, durasi)
+      const fd = new FormData(e.target);
+      const payload = {
+        lapangan_id: fd.get('lapangan_id') || document.getElementById('modal-lapangan-id').value,
+        tanggal: fd.get('tanggal'),
+        jam_mulai: fd.get('jam_mulai'),
+        jam_selesai: '' // backend expects jam_selesai; we will approximate with durasi
+      };
+
+      // calculate jam_selesai by adding durasi minutes (simple approach)
+      try{
+        const durasi = Number(fd.get('durasi') || 60);
+        // jam_mulai format 'HH:MM'
+        const parts = payload.jam_mulai.split(':').map(n=>parseInt(n,10));
+        const date = new Date(); date.setHours(parts[0]); date.setMinutes(parts[1] + durasi);
+        payload.jam_selesai = ('0'+date.getHours()).slice(-2) + ':' + ('0'+date.getMinutes()).slice(-2);
+      }catch(e){ payload.jam_selesai = '' }
+
+      // first: send JSON booking request
+      try {
+        const res = await fetch('/booking', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify(payload) });
+        const ct = res.headers.get('content-type') || '';
+        let j;
+        if(ct.includes('application/json')) j = await res.json(); else j = await res.text();
+        if(!res.ok) throw new Error((j && j.message) ? j.message : (typeof j === 'string' ? j : 'Booking gagal'));
+
+        // if user attached a file, upload it using the returned id
+        const fileInput = e.target.querySelector('input[type=file]');
+        if(fileInput && fileInput.files && fileInput.files.length>0){
+          const bookingId = j.id;
+          const uploadForm = new FormData();
+          uploadForm.append('bukti', fileInput.files[0]);
+          const upRes = await fetch(`/booking/upload/${bookingId}`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: uploadForm });
+          const upCt = upRes.headers.get('content-type') || '';
+          let upJ = upCt.includes('application/json') ? await upRes.json() : await upRes.text();
+          if(!upRes.ok) throw new Error((upJ && upJ.message) ? upJ.message : (typeof upJ === 'string' ? upJ : 'Upload bukti gagal'));
+        }
+
+        alert('Booking berhasil dikirim! Silakan cek riwayat Anda.');
+        closeModal();
+      } catch(err) { alert(err.message || err); }
+    });
+
+    fetchLapangan();
+  </script>
+</body>
+</html>
